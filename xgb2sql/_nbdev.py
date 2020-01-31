@@ -2,9 +2,9 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {}
+index = {"xgb2sql": "00_core.ipynb"}
 
-modules = []
+modules = ["core.py"]
 
 doc_url = "https://Chryzanthemum.github.io/xgb2sql/"
 
