@@ -10,7 +10,7 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: module name here
+      title: XGB2SQL
       url: /core
     output: web
     title: xgb2sql

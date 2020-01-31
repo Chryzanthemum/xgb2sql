@@ -46,9 +46,7 @@ def xgb2sql(xgb_booster, table_name: str, index_list=[], sql_type=None):
             query = f"""\nSELECT
     {index_string},
     1 / ( 1 + EXP ( - (
-    {column_string}) ) ) AS score,
-    'consumer_arbiter_action_variable_score_model_V1' AS model,
-    CURRENT_TIMESTAMP() AS _created_at
+    {column_string}) ) ) AS score
 FROM booster_output"""
         else:
             query = f"""\nSELECT
@@ -85,8 +83,6 @@ unnested AS (
 SELECT
     {index_string},
     1 / ( 1 + EXP ( - SUM ( CAST ( value AS FLOAT64 ) ) ) ) AS score,
-    'consumer_arbiter_action_variable_score_model_V1' AS model,
-    CURRENT_TIMESTAMP() AS _created_at
 FROM unnested
 WHERE variable_name NOT IN (
     {_string_parse(index_list)}
@@ -233,7 +229,6 @@ FROM unnested
         "WITH booster_output AS (\n\tSELECT\n"
         + ", \n".join((index_list + leaf_list))
         + f"\n\tFROM {table_name}"
-        + f"\n\tWHERE source = 'test'\n)"
         + f"\n{output}"
     )
 

@@ -1,6 +1,6 @@
 ---
 
-title: module name here
+title: XGB2SQL
 
 keywords: fastai
 sidebar: home_sidebar
@@ -51,6 +51,297 @@ sql_type : str
 
 </div>
 
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_breast_cancer</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">load_breast_cancer</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">woo</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">woo</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>XGBClassifier(base_score=0.5, booster=&#39;gbtree&#39;, colsample_bylevel=1,
+              colsample_bynode=1, colsample_bytree=1, gamma=0,
+              learning_rate=0.1, max_delta_step=0, max_depth=3,
+              min_child_weight=1, missing=None, n_estimators=5, n_jobs=1,
+              nthread=None, objective=&#39;binary:logistic&#39;, random_state=0,
+              reg_alpha=0, reg_lambda=1, scale_pos_weight=1, seed=None,
+              silent=None, subsample=1, verbosity=1)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">xgb2sql</span><span class="p">(</span><span class="n">woo</span><span class="o">.</span><span class="n">get_booster</span><span class="p">(),</span> <span class="s1">&#39;breast_cancer&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>WITH booster_output AS (
+	SELECT
+		CASE
+			WHEN ((f7 &lt; 0.0489199981) OR (f7 IS NULL))
+			AND ((f20 &lt; 16.8250008) OR (f20 IS NULL))
+			AND ((f10 &lt; 0.591250002) OR (f10 IS NULL))
+		THEN 0.191869915
+			WHEN ((f7 &lt; 0.0489199981) OR (f7 IS NULL))
+			AND ((f20 &lt; 16.8250008) OR (f20 IS NULL))
+			AND (f10 &gt;= 0.591250002)
+		THEN 0
+			WHEN ((f7 &lt; 0.0489199981) OR (f7 IS NULL))
+			AND (f20 &gt;= 16.8250008)
+			AND ((f1 &lt; 18.9599991) OR (f1 IS NULL))
+		THEN 0.120000005
+			WHEN ((f7 &lt; 0.0489199981) OR (f7 IS NULL))
+			AND (f20 &gt;= 16.8250008)
+			AND (f1 &gt;= 18.9599991)
+		THEN -0.13333334
+			WHEN (f7 &gt;= 0.0489199981)
+			AND ((f23 &lt; 785.799988) OR (f23 IS NULL))
+			AND ((f21 &lt; 23.7399998) OR (f21 IS NULL))
+		THEN 0.155555561
+			WHEN (f7 &gt;= 0.0489199981)
+			AND ((f23 &lt; 785.799988) OR (f23 IS NULL))
+			AND (f21 &gt;= 23.7399998)
+		THEN -0.100000001
+			WHEN (f7 &gt;= 0.0489199981)
+			AND (f23 &gt;= 785.799988)
+			AND ((f1 &lt; 14.3000002) OR (f1 IS NULL))
+		THEN 0
+			WHEN (f7 &gt;= 0.0489199981)
+			AND (f23 &gt;= 785.799988)
+			AND (f1 &gt;= 14.3000002)
+		THEN -0.191176474
+		END AS column_0, 
+		CASE
+			WHEN ((f7 &lt; 0.0500999987) OR (f7 IS NULL))
+			AND ((f20 &lt; 16.8250008) OR (f20 IS NULL))
+			AND ((f13 &lt; 38.6049995) OR (f13 IS NULL))
+		THEN 0.17467472
+			WHEN ((f7 &lt; 0.0500999987) OR (f7 IS NULL))
+			AND ((f20 &lt; 16.8250008) OR (f20 IS NULL))
+			AND (f13 &gt;= 38.6049995)
+		THEN 0.0302315652
+			WHEN ((f7 &lt; 0.0500999987) OR (f7 IS NULL))
+			AND (f20 &gt;= 16.8250008)
+			AND ((f1 &lt; 18.9599991) OR (f1 IS NULL))
+		THEN 0.113052242
+			WHEN ((f7 &lt; 0.0500999987) OR (f7 IS NULL))
+			AND (f20 &gt;= 16.8250008)
+			AND (f1 &gt;= 18.9599991)
+		THEN -0.124826349
+			WHEN (f7 &gt;= 0.0500999987)
+			AND ((f22 &lt; 103.25) OR (f22 IS NULL))
+			AND ((f21 &lt; 25.9249992) OR (f21 IS NULL))
+		THEN 0.140555695
+			WHEN (f7 &gt;= 0.0500999987)
+			AND ((f22 &lt; 103.25) OR (f22 IS NULL))
+			AND (f21 &gt;= 25.9249992)
+		THEN -0.0846852511
+			WHEN (f7 &gt;= 0.0500999987)
+			AND (f22 &gt;= 103.25)
+			AND ((f21 &lt; 20.3549995) OR (f21 IS NULL))
+		THEN -0.01987583
+			WHEN (f7 &gt;= 0.0500999987)
+			AND (f22 &gt;= 103.25)
+			AND (f21 &gt;= 20.3549995)
+		THEN -0.174933031
+		END AS column_1, 
+		CASE
+			WHEN ((f27 &lt; 0.142349988) OR (f27 IS NULL))
+			AND ((f20 &lt; 17.6149998) OR (f20 IS NULL))
+			AND ((f13 &lt; 35.2600021) OR (f13 IS NULL))
+		THEN 0.159918889
+			WHEN ((f27 &lt; 0.142349988) OR (f27 IS NULL))
+			AND ((f20 &lt; 17.6149998) OR (f20 IS NULL))
+			AND (f13 &gt;= 35.2600021)
+		THEN 0.0472318567
+			WHEN ((f27 &lt; 0.142349988) OR (f27 IS NULL))
+			AND (f20 &gt;= 17.6149998)
+			AND ((f29 &lt; 0.0649200007) OR (f29 IS NULL))
+		THEN -0.0155247366
+			WHEN ((f27 &lt; 0.142349988) OR (f27 IS NULL))
+			AND (f20 &gt;= 17.6149998)
+			AND (f29 &gt;= 0.0649200007)
+		THEN -0.119407289
+			WHEN (f27 &gt;= 0.142349988)
+			AND ((f23 &lt; 729.549988) OR (f23 IS NULL))
+			AND ((f4 &lt; 0.1083) OR (f4 IS NULL))
+		THEN 0.120342232
+			WHEN (f27 &gt;= 0.142349988)
+			AND ((f23 &lt; 729.549988) OR (f23 IS NULL))
+			AND (f4 &gt;= 0.1083)
+		THEN -0.108723581
+			WHEN (f27 &gt;= 0.142349988)
+			AND (f23 &gt;= 729.549988)
+			AND ((f10 &lt; 0.241250008) OR (f10 IS NULL))
+		THEN -0.0287595335
+			WHEN (f27 &gt;= 0.142349988)
+			AND (f23 &gt;= 729.549988)
+			AND (f10 &gt;= 0.241250008)
+		THEN -0.163232192
+		END AS column_2, 
+		CASE
+			WHEN ((f7 &lt; 0.0489199981) OR (f7 IS NULL))
+			AND ((f20 &lt; 16.8250008) OR (f20 IS NULL))
+			AND ((f10 &lt; 0.528550029) OR (f10 IS NULL))
+		THEN 0.151598975
+			WHEN ((f7 &lt; 0.0489199981) OR (f7 IS NULL))
+			AND ((f20 &lt; 16.8250008) OR (f20 IS NULL))
+			AND (f10 &gt;= 0.528550029)
+		THEN 0.0131686451
+			WHEN ((f7 &lt; 0.0489199981) OR (f7 IS NULL))
+			AND (f20 &gt;= 16.8250008)
+			AND ((f1 &lt; 18.9599991) OR (f1 IS NULL))
+		THEN 0.101920418
+			WHEN ((f7 &lt; 0.0489199981) OR (f7 IS NULL))
+			AND (f20 &gt;= 16.8250008)
+			AND (f1 &gt;= 18.9599991)
+		THEN -0.113945559
+			WHEN (f7 &gt;= 0.0489199981)
+			AND ((f23 &lt; 785.799988) OR (f23 IS NULL))
+			AND ((f21 &lt; 23.7399998) OR (f21 IS NULL))
+		THEN 0.131930456
+			WHEN (f7 &gt;= 0.0489199981)
+			AND ((f23 &lt; 785.799988) OR (f23 IS NULL))
+			AND (f21 &gt;= 23.7399998)
+		THEN -0.0824727714
+			WHEN (f7 &gt;= 0.0489199981)
+			AND (f23 &gt;= 785.799988)
+			AND ((f12 &lt; 2.02349997) OR (f12 IS NULL))
+		THEN -0.0275684185
+			WHEN (f7 &gt;= 0.0489199981)
+			AND (f23 &gt;= 785.799988)
+			AND (f12 &gt;= 2.02349997)
+		THEN -0.155280709
+		END AS column_3, 
+		CASE
+			WHEN ((f27 &lt; 0.145449996) OR (f27 IS NULL))
+			AND ((f22 &lt; 107.599998) OR (f22 IS NULL))
+			AND ((f13 &lt; 46.7900009) OR (f13 IS NULL))
+		THEN 0.142997682
+			WHEN ((f27 &lt; 0.145449996) OR (f27 IS NULL))
+			AND ((f22 &lt; 107.599998) OR (f22 IS NULL))
+			AND (f13 &gt;= 46.7900009)
+		THEN 0.00895034242
+			WHEN ((f27 &lt; 0.145449996) OR (f27 IS NULL))
+			AND (f22 &gt;= 107.599998)
+			AND ((f21 &lt; 20.0849991) OR (f21 IS NULL))
+		THEN 0.12236432
+			WHEN ((f27 &lt; 0.145449996) OR (f27 IS NULL))
+			AND (f22 &gt;= 107.599998)
+			AND (f21 &gt;= 20.0849991)
+		THEN -0.0948726162
+			WHEN (f27 &gt;= 0.145449996)
+			AND ((f23 &lt; 710.200012) OR (f23 IS NULL))
+			AND ((f21 &lt; 25.0550003) OR (f21 IS NULL))
+		THEN 0.0869635344
+			WHEN (f27 &gt;= 0.145449996)
+			AND ((f23 &lt; 710.200012) OR (f23 IS NULL))
+			AND (f21 &gt;= 25.0550003)
+		THEN -0.0576682575
+			WHEN (f27 &gt;= 0.145449996)
+			AND (f23 &gt;= 710.200012)
+			AND ((f6 &lt; 0.0892650038) OR (f6 IS NULL))
+		THEN -0.0451009385
+			WHEN (f27 &gt;= 0.145449996)
+			AND (f23 &gt;= 710.200012)
+			AND (f6 &gt;= 0.0892650038)
+		THEN -0.147640571
+		END AS column_4
+	FROM breast_cancer
+	WHERE source = &#39;test&#39;
+)
+
+SELECT 
+    1 / ( 1 + EXP ( - ( 
+    column_0
+	+ column_1
+	+ column_2
+	+ column_3
+	+ column_4 ) ) ) AS score
+FROM booster_output
+</pre>
+</div>
 </div>
 
 </div>
