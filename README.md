@@ -27,6 +27,7 @@ So easy even I could do it!
 <div class="input_area" markdown="1">
 
 ```python
+from xgb2sql import core
 import xgboost as xgb
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
@@ -57,7 +58,7 @@ xgb.to_graphviz(woo)
 <div class="input_area" markdown="1">
 
 ```python
-tree = xgb2sql(woo.get_booster(), 'breast_cancer')
+tree = core.xgb2sql(woo.get_booster(), 'breast_cancer')
 print(tree)
 ```
 
