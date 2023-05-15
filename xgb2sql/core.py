@@ -204,7 +204,6 @@ FROM unnested
             column_list = f"{leaves.values()[0]} AS {column}"
         else:
             for base_leaf in leaves:
-                print(leaves, base_leaf)
                 leaf_query = (
                     "\t\t\tWHEN "
                     + _recurse_backwards(base_leaf)
