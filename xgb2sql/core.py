@@ -179,7 +179,7 @@ FROM unnested
                     query_list.insert(0, text)
                     _recurse(next_node)
             except:
-                query_list.insert(0, "TRUE = TRUE")
+                pass
 
         _recurse(first_node)
 
@@ -197,21 +197,25 @@ FROM unnested
     counter = 0
     for i in range(0, len(tree_json)):
         leaves, splits = _extract_values(tree_json[i], "leaf")
-        column_list = []
-
-        for base_leaf in leaves:
-            leaf_query = (
-                "\t\t\tWHEN "
-                + _recurse_backwards(base_leaf)
-                + f"\n\t\tTHEN {leaves[base_leaf]}"
-            )
-
-            column_list.append(leaf_query)
-
+        when_list = []
         column = f"column_{counter}"
-        column_list = "\t\tCASE\n" + ("\n").join(column_list) + f"\n\t\tEND AS {column}"
-
         columns.append(column)
+        if len(leaves) == 1:
+            column_list = f"{leaves.values()[0]} AS {column}"
+        else:
+            for base_leaf in leaves:
+                print(leaves, base_leaf)
+                leaf_query = (
+                    "\t\t\tWHEN "
+                    + _recurse_backwards(base_leaf)
+                    + f"\n\t\tTHEN {leaves[base_leaf]}"
+                )
+
+                when_list.append(leaf_query)
+
+
+            column_list = "\t\tCASE\n" + ("\n").join(when_list) + f"\n\t\tEND AS {column}"
+
         leaf_list.append(column_list)
         counter += 1
 
