@@ -151,44 +151,44 @@ FROM unnested
 
     def _recurse_backwards(first_node) -> str:
 
-    query_list: List[str] = []
-
-    def _recurse(x) -> None:
-
-        prev_node = x
-        next_node = splits[prev_node]["parent"]
-        try:
-            node = splits[next_node]
-            if (node["if_less_than"] == prev_node) and (
-                "if_null" in node
-            ):
-                text = f"(({node['split_column']} < {node['split_number']}) OR ({node['split_column']} IS NULL))"
-                query_list.insert(0, text)
-                _recurse(next_node)
-            elif node["if_less_than"] == prev_node and "split_number" in node:
-                text = f"({node['split_column']} < {node['split_number']})"
-                query_list.insert(0, text)
-                _recurse(next_node)
-            elif node["if_less_than"] == prev_node:
-                text = f"({node['split_column']} < 1)"
-                query_list.insert(0, text)
-                _recurse(next_node)
-            elif (node["if_greater_than"] == prev_node) & (
-                "if_null" in node
-            ):
-                text = f"(({node['split_column']} >= {node['split_number']}) OR ({node['split_column']} IS NULL))"
-                query_list.insert(0, text)
-                _recurse(next_node)
-            elif node["if_greater_than"] == prev_node and "split_number" in node:
-                text = f"({node['split_column']} >= {node['split_number']})"
-                query_list.insert(0, text)
-                _recurse(next_node)
-            elif node["if_greater_than"] == prev_node:
-                text = f"({node['split_column']} >= 1)"
-                query_list.insert(0, text)
-                _recurse(next_node)
-        except:
-            pass
+        query_list: List[str] = []
+    
+        def _recurse(x) -> None:
+    
+            prev_node = x
+            next_node = splits[prev_node]["parent"]
+            try:
+                node = splits[next_node]
+                if (node["if_less_than"] == prev_node) and (
+                    "if_null" in node
+                ):
+                    text = f"(({node['split_column']} < {node['split_number']}) OR ({node['split_column']} IS NULL))"
+                    query_list.insert(0, text)
+                    _recurse(next_node)
+                elif node["if_less_than"] == prev_node and "split_number" in node:
+                    text = f"({node['split_column']} < {node['split_number']})"
+                    query_list.insert(0, text)
+                    _recurse(next_node)
+                elif node["if_less_than"] == prev_node:
+                    text = f"({node['split_column']} < 1)"
+                    query_list.insert(0, text)
+                    _recurse(next_node)
+                elif (node["if_greater_than"] == prev_node) & (
+                    "if_null" in node
+                ):
+                    text = f"(({node['split_column']} >= {node['split_number']}) OR ({node['split_column']} IS NULL))"
+                    query_list.insert(0, text)
+                    _recurse(next_node)
+                elif node["if_greater_than"] == prev_node and "split_number" in node:
+                    text = f"({node['split_column']} >= {node['split_number']})"
+                    query_list.insert(0, text)
+                    _recurse(next_node)
+                elif node["if_greater_than"] == prev_node:
+                    text = f"({node['split_column']} >= 1)"
+                    query_list.insert(0, text)
+                    _recurse(next_node)
+            except:
+                pass
 
     _recurse(first_node)
 
