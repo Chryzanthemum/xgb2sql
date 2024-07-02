@@ -190,11 +190,11 @@ FROM unnested
             except:
                 pass
 
-    _recurse(first_node)
-
-    s = "\n\t\t\tAND "
-
-    return s.join(query_list)
+        _recurse(first_node)
+    
+        s = "\n\t\t\tAND "
+    
+        return s.join(query_list)
 
     tree_json = _json_parse(xgb_booster)
 
