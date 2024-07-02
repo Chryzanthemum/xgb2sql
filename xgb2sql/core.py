@@ -116,25 +116,26 @@ FROM unnested
         def _extract(obj, arr, key, prev=None):
 
             if isinstance(obj, dict):
-                try:
-                    info_dict.update(
-                        {
-                            obj["nodeid"]: {
-                                "parent": prev,
-                                "split_column": obj["split"],
-                                "split_number": obj["split_condition"],
-                                "if_less_than": obj["yes"],
-                                "if_greater_than": obj["no"],
-                                "if_null": obj["missing"],
-                            }
-                        }
-                    )
-
-                except:
-                    info_dict.update({obj["nodeid"]: {"parent": prev}})
-
+            # If every row is filled out for a column, then obj["missing"] is never there.
+                node_info = {"parent": prev}
+    
+                if "split" in obj:
+                    node_info.update({
+                        "split_column": obj["split"],
+                        "if_less_than": obj.get("yes"),
+                        "if_greater_than": obj.get("no"),
+                    })
+    
+                    if "split_condition" in obj:
+                        node_info["split_number"] = obj["split_condition"]
+                    
+                    if "missing" in obj:
+                        node_info["if_null"] = obj["missing"]
+    
+                info_dict[obj["nodeid"]] = node_info
+    
                 prev = obj["nodeid"]
-
+    
                 for k, v in obj.items():
                     if isinstance(v, (dict, list)):
                         _extract(v, arr, key, prev)
