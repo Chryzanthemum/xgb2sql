@@ -151,42 +151,50 @@ FROM unnested
 
     def _recurse_backwards(first_node) -> str:
 
-        query_list: List[str] = []
+    query_list: List[str] = []
 
-        def _recurse(x) -> None:
+    def _recurse(x) -> None:
 
-            prev_node = x
-            next_node = splits[prev_node]["parent"]
-            try:
-                node = splits[next_node]
-                if (node["if_less_than"] == prev_node) & (
-                    node["if_less_than"] == node["if_null"]
-                ):
-                    text = f"(({node['split_column']} < {node['split_number']}) OR ({node['split_column']} IS NULL))"
-                    query_list.insert(0, text)
-                    _recurse(next_node)
-                elif node["if_less_than"] == prev_node:
-                    text = f"({node['split_column']} < {node['split_number']})"
-                    query_list.insert(0, text)
-                    _recurse(next_node)
-                elif (node["if_greater_than"] == prev_node) & (
-                    node["if_greater_than"] == node["if_null"]
-                ):
-                    text = f"(({node['split_column']} >= {node['split_number']}) OR ({node['split_column']} IS NULL))"
-                    query_list.insert(0, text)
-                    _recurse(next_node)
-                elif node["if_greater_than"] == prev_node:
-                    text = f"({node['split_column']} >= {node['split_number']})"
-                    query_list.insert(0, text)
-                    _recurse(next_node)
-            except:
-                pass
+        prev_node = x
+        next_node = splits[prev_node]["parent"]
+        try:
+            node = splits[next_node]
+            if (node["if_less_than"] == prev_node) and (
+                "if_null" in node
+            ):
+                text = f"(({node['split_column']} < {node['split_number']}) OR ({node['split_column']} IS NULL))"
+                query_list.insert(0, text)
+                _recurse(next_node)
+            elif node["if_less_than"] == prev_node and "split_number" in node:
+                text = f"({node['split_column']} < {node['split_number']})"
+                query_list.insert(0, text)
+                _recurse(next_node)
+            elif node["if_less_than"] == prev_node:
+                text = f"({node['split_column']} < 1)"
+                query_list.insert(0, text)
+                _recurse(next_node)
+            elif (node["if_greater_than"] == prev_node) & (
+                "if_null" in node
+            ):
+                text = f"(({node['split_column']} >= {node['split_number']}) OR ({node['split_column']} IS NULL))"
+                query_list.insert(0, text)
+                _recurse(next_node)
+            elif node["if_greater_than"] == prev_node and "split_number" in node:
+                text = f"({node['split_column']} >= {node['split_number']})"
+                query_list.insert(0, text)
+                _recurse(next_node)
+            elif node["if_greater_than"] == prev_node:
+                text = f"({node['split_column']} >= 1)"
+                query_list.insert(0, text)
+                _recurse(next_node)
+        except:
+            pass
 
-        _recurse(first_node)
+    _recurse(first_node)
 
-        s = "\n\t\t\tAND "
+    s = "\n\t\t\tAND "
 
-        return s.join(query_list)
+    return s.join(query_list)
 
     tree_json = _json_parse(xgb_booster)
 
