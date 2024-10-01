@@ -210,7 +210,7 @@ FROM unnested
         column = f"column_{counter}"
         columns.append(column)
         if len(leaves) == 1:
-            column_list = f"{leaves.values()[0]} AS {column}"
+            column_list = f"{leaves[0]} AS {column}"
         else:
             for base_leaf in leaves:
                 leaf_query = (
